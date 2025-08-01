@@ -1,4 +1,6 @@
-compile_commands.json
+.cache/
+.vscode/
 build/
 generated.mk
+compile_commands.json
 kernel
