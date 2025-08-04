@@ -6,7 +6,7 @@
 #    By: ethebaul <ethebaul@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/06/20 05:06:30 by ethebaul          #+#    #+#              #
-#    Updated: 2025/08/04 19:24:32 by ethebaul         ###   ########.fr        #
+#    Updated: 2025/08/04 19:33:42 by ethebaul         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,7 +19,7 @@ MKGENERATED			=	./make/generated.mk
 MKCOLOR				=	./make/color.mk
 
 CC					=	gcc
-AS					=	as
+AS					=	nasm
 ld					=	ld
 CCFLAGS				=	-m64 -ffreestanding -fno-builtin -fno-stack-protector \
 						-nostdlib -nostdinc -fno-pie -no-pie \
