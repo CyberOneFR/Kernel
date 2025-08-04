@@ -6,7 +6,7 @@
 #    By: ethebaul <ethebaul@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/06/20 05:06:30 by ethebaul          #+#    #+#              #
-#    Updated: 2025/08/01 01:27:38 by ethebaul         ###   ########.fr        #
+#    Updated: 2025/08/04 19:24:32 by ethebaul         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,7 +25,7 @@ CCFLAGS				=	-m64 -ffreestanding -fno-builtin -fno-stack-protector \
 						-nostdlib -nostdinc -fno-pie -no-pie \
 						-std=gnu99 -O2 -Wall -Wextra -Werror
 ASFLAGS				=	--64
-LDFLAGS				=	-m elf_x86_64 -nostdlib
+LDFLAGS				=	-m elf_x86_64 -nostdlib -T kernel.ld
 
 NAME				=	kernel
 
