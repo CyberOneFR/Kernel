@@ -10,7 +10,8 @@
 #                                                                              #
 # **************************************************************************** #
 
-NAME				=	kernel.out
+ISO_DIR				=	iso
+NAME				=	$(ISO_DIR)/kernel.iso
 
 BUILD_DIR			=	build
 HEADERS_DIR			=	headers
@@ -28,11 +29,12 @@ AS					=	nasm
 ASFLAGS				=	-felf64
 
 LD					=	ld
-LDFLAGS				=	-m elf_x86_64 -nostdlib -T srcs/linker.ld
+LDFLAGS				=	-m elf_x86_64 -nostdlib --oformat binary -T srcs/linker.ld
 
 all: $(MKGENERATED)
 	@$(MAKE) --no-print-directory $(NAME)
 
+.PHONY: $(MKGENERATED)
 $(MKGENERATED):
 	./configure
 
@@ -40,8 +42,9 @@ $(MKGENERATED):
 
 .SILENT: $(NAME)
 $(NAME): $(OBJS)
-	echo -ne $(BLUE)$(NAME)$(RESET) $(NAME) " "
-	$(LD) $(LDFLAGS) -o $@ $(OBJS)
+	@mkdir -p $(dir $@)
+	echo -ne $(BLUE)$(NAME)$(RESET) " "
+	$(LD) $(LDFLAGS) -o $(ISO_DIR)/kernel.bin $(OBJS)
 	echo -e $(GREEN)Kernel Built Successfully$(RESET)
 
 .PHONY: clean
@@ -51,12 +54,17 @@ clean:
 
 .PHONY: fclean
 fclean: clean
+	rm -f $(ISO_DIR)/kernel.bin
 	rm -f $(NAME)
 
 .SILENT: re
 .PHONY: re
 re: fclean
 	$(MAKE) --no-print-directory all
+
+.PHONY: run
+run: all
+	timeout -fs KILL 5.0s qemu-system-x86_64 -nographic iso/kernel.bin
 
 .SILENT: compile_commands.json
 compile_commands.json:

@@ -1,28 +1,22 @@
-ENTRY(_start)
+ENTRY(bootloader)
 
 SECTIONS
 {
-    . = 1M;
-    
-    .text BLOCK(4K) : ALIGN(4K)
-    {
-        *(.multiboot)
-        *(.text)
-    }
-    
-    .rodata BLOCK(4K) : ALIGN(4K)
-    {
-        *(.rodata)
-    }
-    
-    .data BLOCK(4K) : ALIGN(4K)
-    {
-        *(.data)
-    }
-    
-    .bss BLOCK(4K) : ALIGN(4K)
-    {
-        *(COMMON)
-        *(.bss)
-    }
+	. = 1M;
+
+	.boot : {
+		KEEP(*(.boot))
+	}
+
+	.text : {
+		*(.text)
+	}
+
+	.data : {
+		*(.data)
+	}
+	
+	.bss : {
+		*(.bss)
+	}
 }
