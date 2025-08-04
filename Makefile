@@ -10,48 +10,56 @@
 #                                                                              #
 # **************************************************************************** #
 
-BUILD_DIR			=	./build/
-HEADERS_DIR			=	./headers/
-SRCS_DIR			=	./srcs/
+NAME				=	kernel.out
 
-MKCONFIGURE			=	./make/configure.mk
-MKGENERATED			=	./make/generated.mk
-MKCOLOR				=	./make/color.mk
+BUILD_DIR			=	build
+HEADERS_DIR			=	headers
+SRCS_DIR			=	srcs
+
+MKGENERATED			=	make/generated.mk
+MKCOLOR				=	make/color.mk
 
 CC					=	gcc
+CFLAGS				=	-m64 -ffreestanding -fno-builtin -fno-stack-protector \
+						-nostdlib -nostdinc -fno-pie -O2 \
+						-Wall -Wextra -Werror -Wpedantic
+
 AS					=	nasm
-LD					=	ld
-CCFLAGS				=	-m64 -ffreestanding -fno-builtin -fno-stack-protector \
-						-nostdlib -nostdinc -fno-pie -no-pie \
-						-std=gnu99 -O2 -Wall -Wextra -Werror
 ASFLAGS				=	-felf64
-LDFLAGS				=	-m elf_x86_64 -nostdlib -T kernel.ld
 
-NAME				=	kernel
+LD					=	ld
+LDFLAGS				=	-m elf_x86_64 -nostdlib -T srcs/linker.ld
 
-all: $(NAME)
+all: $(MKGENERATED)
+	@$(MAKE) --no-print-directory $(NAME)
 
--include $(MKCONFIGURE) $(MKGENERATED) $(MKCOLOR)
+$(MKGENERATED):
+	./configure
 
+-include $(MKGENERATED) $(MKCOLOR)
+
+.SILENT: $(NAME)
 $(NAME): $(OBJS)
-	@echo -e $(BLUE)$(NAME)$(RESET) Linking...
-	@$(LD) $(LDFLAGS) -o $@ $(OBJS)
-	@echo -e $(GREEN)Kernel Built Successfully$(RESET)
+	echo -ne $(BLUE)$(NAME)$(RESET) $(NAME) " "
+	$(LD) $(LDFLAGS) -o $@ $(OBJS)
+	echo -e $(GREEN)Kernel Built Successfully$(RESET)
 
-clangd:
-	@rm -rf ./.cache
-	@rm -rf compile_commands.json
-	@echo $(CC) $(CCFLAGS) $(HEADERS) $(SRCS) | compiledb
-
+.PHONY: clean
 clean:
-	@rm -rf $(BUILD_DIR)
+	rm -rf $(BUILD_DIR)
+	rm -f $(MKGENERATED)
 
+.PHONY: fclean
 fclean: clean
-	@rm -f $(NAME)
+	rm -f $(NAME)
 
+.SILENT: re
+.PHONY: re
 re: fclean
-	@$(MAKE) --no-print-directory all
+	$(MAKE) --no-print-directory all
+
+.SILENT: compile_commands.json
+compile_commands.json:
+	@echo $(CC) $(CFLAGS) $(HEADERS) $(SRCS) | compiledb
 
 -include $(DEPS)
-
-.PHONY : all clean fclean re clangd

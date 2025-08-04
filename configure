@@ -1,0 +1,64 @@
+#!/bin/env bash
+
+HEADERS_DIR=headers
+SRCS_DIR=srcs
+BUILD_DIR=build
+MKGENERATED=make/generated.mk
+MKCOLOR=make/color.mk
+
+function filter() {
+	local args=($@)
+	echo "${args[@]:1}" | tr ' ' '\n' | grep "$1"
+}
+
+sources="$(find $SRCS_DIR -type f -name '*.[sc]')"
+files="$(echo $sources | tr ' ' '\n' | sed -r "s@$SRCS_DIR/@@g")"
+objects="$(echo $files | tr ' ' '\n' | sed -r "s@([^\s]+).[sc]@$BUILD_DIR/\1.o@g")"
+dependencies="${objects//.o/.d}"
+
+function print() {
+	echo >> $MKGENERATED "$@"
+}
+
+function append_file() {
+	echo >> $MKGENERATED -ne ' \\n	'$1
+}
+
+function configure() {
+	echo > $MKGENERATED
+
+	print "include $MKCOLOR"
+	print
+	print 'HEADERS +=' ${HEADERS_DIR//*/-I&}
+	print
+	print 'SRCS =' $sources
+	print
+	print 'OBJS =' $objects
+	print
+
+	print "$BUILD_DIR:"
+	print "	mkdir -p $(dirname $objects | sort | uniq | tr '\n' ' ')"
+
+	local asm_files="$(filter '.s' "$files")"
+	for file in $asm_files; do
+		print
+		local obj_file="$BUILD_DIR/${file/.s/.o}"
+		print "$obj_file: $SRCS_DIR/$file | $BUILD_DIR"
+		print '	@echo -ne $(BLUE)$(NAME)$(RESET) " "'
+		print '	$(AS) $(ASFLAGS) $(HEADERS) -o $@ $<'
+	done
+
+	local c_files="$(filter '.c' "$files")"
+	for file in $c_files; do
+		print
+		local obj_file="$BUILD_DIR/${file/.c/.o}"
+		print "$obj_file: $SRCS_DIR/$file | $BUILD_DIR"
+		print '	@echo -ne $(BLUE)$(NAME)$(RESET) " "'
+		print '	$(CC) $(CFLAGS) $(HEADERS) -MD -MP -o $@ -c $<'
+		print
+	done
+
+	print "-include $(echo $dependencies | tr '\n' ' ')"
+}
+
+configure "$@"
