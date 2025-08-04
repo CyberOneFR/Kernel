@@ -35,7 +35,7 @@ all: $(NAME)
 -include $(MKCONFIGURE) $(MKGENERATED) $(MKCOLOR)
 
 $(NAME): $(OBJS)
-	@$(LD) $(LDFLAGS) -T linker.ld -o $@ $(OBJS)
+	@$(LD) $(LDFLAGS) -o $@ $(OBJS)
 	@echo -e $(BLUE)$(NAME)$(RESET) compiling: $@
 
 clangd:
