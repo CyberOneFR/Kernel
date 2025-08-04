@@ -20,23 +20,23 @@ MKCOLOR				=	./make/color.mk
 
 CC					=	gcc
 AS					=	nasm
-ld					=	ld
+LD					=	ld
 CCFLAGS				=	-m64 -ffreestanding -fno-builtin -fno-stack-protector \
 						-nostdlib -nostdinc -fno-pie -no-pie \
 						-std=gnu99 -O2 -Wall -Wextra -Werror
-ASFLAGS				=	--64
+ASFLAGS				=	-felf64
 LDFLAGS				=	-m elf_x86_64 -nostdlib -T kernel.ld
 
 NAME				=	kernel
 
 all: $(NAME)
-	@echo -e $(GREEN)Kernel Built Successfully$(RESET)
 
 -include $(MKCONFIGURE) $(MKGENERATED) $(MKCOLOR)
 
 $(NAME): $(OBJS)
+	@echo -e $(BLUE)$(NAME)$(RESET) Linking...
 	@$(LD) $(LDFLAGS) -o $@ $(OBJS)
-	@echo -e $(BLUE)$(NAME)$(RESET) compiling: $@
+	@echo -e $(GREEN)Kernel Built Successfully$(RESET)
 
 clangd:
 	@rm -rf ./.cache
@@ -49,7 +49,8 @@ clean:
 fclean: clean
 	@rm -f $(NAME)
 
-re: fclean all
+re: fclean
+	@$(MAKE) --no-print-directory all
 
 -include $(DEPS)
 
